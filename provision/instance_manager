@@ -1,31 +1,18 @@
 #!/bin/bash
 
-#Write instance id parameter into file.
+#Definition:script to manage instances for the railsplay app continious deployment
 
-id_file="/home/npakhol/blog/provision/instance_id"
-aws ssm get-parameter --name /railsplay/instance_id --output text | awk '{print $4}'>${id_file}
-
-#Check if the id_file exist and whether it is empty or not.Depending on the result take actions to terminate old if needed and run new instance.
-
-old_instance_id=$(cat /home/npakhol/blog/provision/instance_id)
-
-if [ -f ${id_file} ]
-then
-    if [ -s ${id_file} ]
-    then
-        aws ec2 terminate-instances --instance-ids $old_instance_id 
 #Defining function that create new inctance
 create_new_instance(){
 	new_instance_id=$(aws ec2 run-instances --image-id ami-0e55e373 --security-group-ids sg-c93d36a0 --count 1 --instance-type t2.micro --key-name devenv-key --query 'Instances[0].InstanceId' | sed "s/\"//g")
 	aws ssm put-parameter --name /railsplay/instance_id --value $new_instance_id --type String --overwrite 
-aws ssm get-parameter --name /railsplay/instance_id --output text | awk '{print $4}'>${id_file}
 }
-create_new_instance
-else
-create_new_instance
-    fi
-else
-create_new_instance
-    fi
+instance_id=$(aws ssm get-parameter --name /railsplay/instance_id --output text | awk '{print $4}')
+#Check if the instance_id parameter is set and take actions to terminate old if needed and run new instance.
 
-
+if [ -n "${instance_id}" ]; then
+     aws ec2 terminate-instances --instance-ids $instance_id
+     create_new_instance
+else
+	create_new_instance
+fi
