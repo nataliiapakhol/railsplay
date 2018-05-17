@@ -1,0 +1,19 @@
+[Unit]
+Description=railsapp
+Requires=network.target
+
+[Service]
+Type=simple
+User=railsplay
+Group=railsplay
+WorkingDirectory=/home/railsplay/blog
+ExecStart=/usr/local/bin/bundle exec rails server
+
+#Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=railsapp
+Environment=RAILS_ENV=development
+
+[Install]
+WantedBy=multi-user.target
