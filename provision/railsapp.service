@@ -9,7 +9,6 @@ Group=railsplay
 WorkingDirectory=/home/railsplay/blog
 ExecStart=/usr/local/bin/bundle exec rails server
 
-#Restart=always
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=railsapp
