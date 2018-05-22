@@ -12,7 +12,7 @@ sudo apt-get update -y
 sudo apt-get install -y git git-core zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python-software-properties libffi-dev nodejs
 
 #3.cd to new user's home dir and clone the remote repository to the new user's home dir 
-sudo su - railsplay -c "git clone https://github.com/nataliiapakhol/railsplay.git"
+sudo su - railsplay -c "git clone https://github.com/nataliiapakhol/railsplay.git blog"
 
 #4.Install ruby 2.5.1(used version while creating)
 cd /home/railsplay
@@ -25,12 +25,12 @@ sudo make install
 
 #5.Install Bundler&Rails
 sudo gem install bundler
-cd /home/railsplay/railsplay
+cd /home/railsplay/blog
 bundle install
 
 sudo su railsplay -c "rails db:migrate RAILS_ENV=development"
 #6.Copy systemd service script to the corect dir
-sudo cp /home/railsplay/railsplay/provision/railsapp.service /etc/systemd/system/railsapp.service
+sudo cp /home/railsplay/blog/provision/railsapp.service /etc/systemd/system/railsapp.service
 sudo systemctl enable railsapp.service
 sudo systemctl start railsapp.service
 
