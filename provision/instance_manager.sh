@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 #Description:script to re_run instances for the railsplay app continious deployment
 #Function that create new inctance
 
