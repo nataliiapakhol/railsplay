@@ -4,7 +4,7 @@
 #Function that create new inctance
 
 create_instance(){
-	instance_id=$(aws ec2 run-instances --image-id ami-0e55e373 --security-group-ids sg-c93d36a0 --count 1 --instance-type t2.micro --key-name devenv-key --user-data file://enviroment_provision.sh --query 'Instances[0].InstanceId' | sed "s/\"//g")
+	instance_id=$(aws ec2 run-instances --image-id ami-0e55e373 --security-group-ids sg-c93d36a0 --count 1 --instance-type t2.micro --key-name devenv-key --user-data file://provision/enviroment_provision.sh --query 'Instances[0].InstanceId' | sed "s/\"//g")
 	aws ssm put-parameter --name /railsplay/instance_id --value $instance_id --type String --overwrite 
 }
 old_instance_id=$(aws ssm get-parameter --name /railsplay/instance_id --query 'Parameter.Value' | sed "s/\"//g")
