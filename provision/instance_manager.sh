@@ -7,6 +7,7 @@ set -e
 create_instance(){
 	instance_id=$(aws ec2 run-instances --image-id ami-0e55e373 --security-group-ids sg-c93d36a0 --count 1 --instance-type t2.micro --key-name devenv-key --user-data file://provision/enviroment_provision.sh --tag-specifications 'ResourceType=instance,Tags=[{Key=name,Value=railsplay}]' --query 'Instances[0].InstanceId' | sed "s/\"//g")
 	aws ssm put-parameter --name /railsplay/instance_id --value $instance_id --type String --overwrite 
+#Assign Elastic IP to the newly created instance
 	(sleep 2m; aws ec2 associate-address --instance-id $instance_id --allocation-id eipalloc-c3e6c6ed)
 }
 old_instance_id=$(aws ssm get-parameter --name /railsplay/instance_id --query 'Parameter.Value' | sed "s/\"//g")
