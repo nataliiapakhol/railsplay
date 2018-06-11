@@ -23,11 +23,6 @@ variable "availability_zone" {
   default     = "eu-west-3a"
 }
 
-variable "bastion_ami" {
-  description = "Ubuntu AMI for the bastion host instance"
-  default     = "ami-1960d164"
-}
-
 variable "key_name" {
   description = "Key for the bastion host instance"
   default     = "npakhol"

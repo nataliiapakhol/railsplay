@@ -1,0 +1,5 @@
+#ignor some files and dir  in current dir
+/.terraform/ 
+*.tfstate
+*.tfstate.backup
+

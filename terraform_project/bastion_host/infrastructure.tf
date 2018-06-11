@@ -143,7 +143,7 @@ resource "aws_security_group" "bastion" {
 #Launch the bastion instance
 
 resource "aws_instance" "bastion" {
-  ami                    = "var.bastion_ami"
+  ami                    = "ami-1960d164"
   instance_type          = "t2.micro"
   key_name               = "${var.key_name}"
   monitoring             = true
@@ -160,24 +160,58 @@ resource "aws_eip" "bastion_eip" {
   instance = "${aws_instance.bastion.id}"
 }
 
-#Adding the OpsWorks stack
+#Creating policy for the opsworks stack
+resource "aws_iam_role_policy" "opsworks" {
+  name = "opsworks-role-policy"
+  role = "${aws_iam_role.opsworks.id}"
+    policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:Describe*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
 
-resource "aws_opsworks_stack" "bastion host" {
-  name                         = "bastion_host_np"
-  region                       = "${var.aws_region}"
-  vpc_id                       = "${aws_vpc.vpc.id}"
+resource "aws_iam_role" "opsworks" {
+  name = "opsworks-role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "opsworks.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+# IAM profile
+resource "aws_iam_instance_profile" "opsworks" {
+  name  = "opsworks"
+  role = "${aws_iam_role.opsworks.name}"
+}
+
+# Create AWS OpsWorks Stack
+resource "aws_opsworks_stack" "main" {
+  name                         = "ssh-bastion-stack-np"
+  region                       = "eu-west-3"
   service_role_arn             = "${aws_iam_role.opsworks.arn}"
   default_instance_profile_arn = "${aws_iam_instance_profile.opsworks.arn}"
-
-  tags {
-    Name = "np_stack"
-  }
-
-  custom_json = <<EOT
-{
- "foobar": {
-    "version": "1.0.0"
-  }
+  vpc_id                       = "${aws_vpc.vpc.id}"
+  default_subnet_id            = "${aws_subnet.public_subnet.id}"
 }
-EOT
-}
+
